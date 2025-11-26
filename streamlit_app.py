@@ -11,12 +11,9 @@ Tell us your **research interests and early thesis ideas**.
 We'll recommend suitable ASCoR supervisors and link you to the most relevant DOIs from their work.
 """)
 
-# Load spaCy
+# Load spaCy model
 @st.cache_resource
-def load_nlp():
-    return spacy.load("en_core_web_sm")
-
-nlp = load_nlp()
+nlp = spacy.load("en_core_web_sm") 
 
 # Load precomputed recommender package
 @st.cache_data
