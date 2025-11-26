@@ -14,8 +14,6 @@ user_input = st.text_area(
     height=150
 )
 
-# Number of recommendations
-num_results = st.slider("Number of supervisors to recommend:", 1, 10, 5)
 
 # Recommend button
 if st.button("Recommend Supervisors"):
