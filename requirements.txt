@@ -1,4 +1,3 @@
 streamlit
 scikit-learn
 spacy
-en-core_web-sm
