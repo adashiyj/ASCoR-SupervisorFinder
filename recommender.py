@@ -4,7 +4,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction import _stop_words
 
 # Load precomputed data (vectorizer, TF-IDF matrix, researcher info)
-with open("researcher_data.pkl", "rb") as f:
+with open("precomputed.pkl.gz", "rb") as f:
     researcher_works = pickle.load(f)
     researcher_names = list(researcher_works.keys())
     tfidf_matrix = pickle.load(f)  # precomputed TF-IDF matrix
