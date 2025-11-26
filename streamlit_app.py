@@ -1,34 +1,28 @@
 import streamlit as st
-import gzip
-import pickle
-import recommender
+from recommender import recommend_supervisors
 
-# Title
-st.title("ASCoR Supervisor Finder")
-st.write("Find suitable supervisors based on your research interests.")
+st.set_page_config(page_title="ASCoR Master's Thesis Supervisor Finder", page_icon="🎓")
 
-
-# Input from user
-user_input = st.text_area(
-    "Tell us something about your research interests and what you would like to do for your thesis:",
-    height=150
+st.title("ASCoR Master's Thesis Supervisor Finder")
+st.write(
+    "Tell me something about your research interests and what you would like to do for your thesis."
 )
 
+# User input
+user_input = st.text_area("Your research interests", "", height=150)
 
-# Recommend button
-if st.button("Recommend Supervisors"):
-    if not user_input.strip():
-        st.warning("Please enter some text to get recommendations.")
+
+if st.button("Find Supervisors") and user_input.strip():
+    with st.spinner("Finding the best supervisors..."):
+        results = recommend_supervisors(user_input)
+
+    if results:
+        for res in results:
+            st.subheader(res["researcher"])
+            st.write(f"**Similarity Score:** {res['similarity_score']:.3f}")
+            st.write("**Top Keywords:**", ", ".join(res["top_keywords"]))
+            st.write("**Top Papers:**")
+            for paper in res["top_papers"]:
+                st.markdown(f"- [{paper['doi']}]({paper['doi']}) – Similarity: {paper['similarity']:.3f}")
     else:
-        with st.spinner("Finding best supervisors..."):
-            results = recommend_supervisors(user_input, researcher_data, top_n=num_results)
-            
-        if results:
-            st.success(f"Top {len(results)} supervisors:")
-            for i, res in enumerate(results, start=1):
-                st.write(f"**{i}. {res['name']}**")
-                st.write(f"   Affiliation: {res.get('affiliation', 'N/A')}")
-                st.write(f"   Expertise: {res.get('expertise', 'N/A')}")
-                st.write("---")
-        else:
-            st.info("No suitable supervisors found.")
+        st.write("Try refining your input.")
