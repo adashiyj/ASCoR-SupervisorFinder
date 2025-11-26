@@ -1,45 +1,37 @@
 import streamlit as st
-import gzip, pickle
-from recommender import recommend_supervisors
+import gzip
+import pickle
+from recommender import recommend_supervisors  # expects precomputed data
 
-st.set_page_config(page_title="ASCoR Supervisor Finder")
-
-st.title("🎓 ASCoR Thesis Supervisor Recommender")
-
-st.write("""
-Tell us your **research interests and early thesis ideas**.  
-We'll recommend suitable ASCoR supervisors and link you to the most relevant DOIs from their work.
-""")
+# Title
+st.title("ASCoR Supervisor Finder")
+st.write("Find suitable supervisors based on your research interests.")
 
 
-if st.button("🔍 Recommend Supervisors"):
+
+# Input from user
+user_input = st.text_area(
+    "Tell us something about your research interests and what you would like to do for your thesis:",
+    height=150
+)
+
+# Number of recommendations
+num_results = st.slider("Number of supervisors to recommend:", 1, 10, 5)
+
+# Recommend button
+if st.button("Recommend Supervisors"):
     if not user_input.strip():
-        st.warning("Please enter your research interests!")
+        st.warning("Please enter some text to get recommendations.")
     else:
-        doc = nlp(user_input.lower())
-        tokens = [t.lemma_ for t in doc if t.is_alpha and not t.is_stop]
-        user_text = " ".join(tokens)
-
-        user_vec = vectorizer.transform([user_text])
-        sims = cosine_similarity(user_vec, tfidf_matrix).flatten()
-        top_idx = sims.argsort()[::-1][:3]
-
-        for i in top_idx:
-            rname = researcher_names[i]
-            st.subheader(rname)
-            st.write(f"**Match score:** `{sims[i]:.3f}`")
-            st.write("**Top expertise keywords:**", ", ".join(researcher_top_keywords.get(rname, [])))
-
-            works = researcher_works.get(rname, [])
-            if not works:
-                st.write("_No publications found_")
-            else:
-                top_papers = sorted(works, key=lambda w: w.get("cited_by_count", 0), reverse=True)[:3]
-                st.write("**Relevant publications (DOIs):**")
-                for p in top_papers:
-                    st.write("-", p.get("doi", "No DOI"), f"(citations: {p.get('cited_by_count', 0)})")
-
-            st.divider()
-
-
-
+        with st.spinner("Finding best supervisors..."):
+            results = recommend_supervisors(user_input, researcher_data, top_n=num_results)
+            
+        if results:
+            st.success(f"Top {len(results)} supervisors:")
+            for i, res in enumerate(results, start=1):
+                st.write(f"**{i}. {res['name']}**")
+                st.write(f"   Affiliation: {res.get('affiliation', 'N/A')}")
+                st.write(f"   Expertise: {res.get('expertise', 'N/A')}")
+                st.write("---")
+        else:
+            st.info("No suitable supervisors found.")
