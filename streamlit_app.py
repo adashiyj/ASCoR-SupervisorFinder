@@ -11,9 +11,7 @@ st.set_page_config(
 
 # Header
 st.markdown(
-    """
-    <h1 style='text-align: center; color: #4B0082;'>ASCoR Master's Thesis Supervisor Finder 🎓✨</h1>
-    """,
+    "<h1 style='display: inline; font-size: 2rem;'> ASCoR Master's Thesis Supervisor Finder ✨</h1>",
     unsafe_allow_html=True
 )
 
@@ -33,25 +31,27 @@ user_input = st.text_area(
 )
 
 # Find supervisors button
-if st.button("🔍 Find My Supervisor(s)") and user_input.strip():
-    with st.spinner("Searching for the best supervisors..."):
-        results = recommend_supervisors(user_input)
+# Find supervisors button
+if st.button("🔍 Find My Supervisor(s)"):
+    if user_input.strip():
+        with st.spinner("Searching for the best supervisors..."):
+            results = recommend_supervisors(user_input)
 
-    if results:
-        st.success(f"Found {len(results)} supervisor(s) matching your research interests!")
-        for res in results:
-            st.markdown(f"### {res['researcher']}")
-            st.markdown(f"**Similarity Score:** {res['similarity_score']:.3f}")
-            st.markdown(f"**Top Keywords:** {', '.join(res['top_keywords'])}")
-            st.markdown("**Top Papers:**")
-            for paper in res["top_papers"]:
-                st.markdown(
-                    f"- [{paper['doi']}]({paper['doi']}) – Similarity: {paper['similarity']:.3f}"
-                )
-            st.markdown("---")
+        if results:
+            st.success(f"Found {len(results)} supervisor(s) matching your research interests!")
+            for res in results:
+                st.markdown(f"### {res['researcher']}")
+                st.markdown(f"**Similarity Score:** {res['similarity_score']:.3f}")
+                st.markdown(f"**Top Keywords:** {', '.join(res['top_keywords'])}")
+                st.markdown("**Top Papers:**")
+                for paper in res["top_papers"]:
+                    st.markdown(
+                        f"- [{paper['doi']}]({paper['doi']}) – Similarity: {paper['similarity']:.3f}"
+                    )
+                st.markdown("---")
+        else:
+            st.warning("No suitable supervisors found. Please refine your input and try again.")
     else:
-        st.warning("No suitable supervisors found. Please refine your input and try again.")
+        st.info("Please enter your research interests above before searching.")
 
-elif st.button("🔍 Find My Supervisor(s)"):
-    st.info("Please enter your research interests above before searching.")
 
