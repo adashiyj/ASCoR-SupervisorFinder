@@ -1,5 +1,5 @@
 import streamlit as st
-import recommender
+import recommender.py
 
 st.set_page_config(page_title="ASCoR Master's Thesis Supervisor Finder", page_icon="🎓")
 
