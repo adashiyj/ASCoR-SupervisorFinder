@@ -7,7 +7,14 @@ from recommender import recommend_supervisors  # expects precomputed data
 st.title("ASCoR Supervisor Finder")
 st.write("Find suitable supervisors based on your research interests.")
 
+# Load precomputed data
+@st.cache_data
+def load_data(file_path="researcher_works.pkl.gz"):
+    with gzip.open(file_path, "rb") as f:
+        data = pickle.load(f)
+    return data
 
+researcher_data = load_data()
 
 # Input from user
 user_input = st.text_area(
