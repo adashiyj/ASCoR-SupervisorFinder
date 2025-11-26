@@ -11,7 +11,7 @@ st.set_page_config(
 
 # Header
 st.markdown(
-    "<h1 style='display: inline; font-size: 2rem;'> ASCoR Master's Thesis Supervisor Finder ✨</h1>",
+    "<h1 style='display: inline; font-size: 2rem;'>🎓 ASCoR Master's Thesis Supervisor Finder ✨</h1>",
     unsafe_allow_html=True
 )
 
@@ -27,12 +27,18 @@ st.markdown(
     """,
 )
 
+# Add some vertical space
+st.markdown("<br>", unsafe_allow_html=True)
+
 # User input
 user_input = st.text_area(
     "📝 Enter your research interests and thesis ideas:",
     placeholder="e.g., I am interested in political communication, especially...",
     height=180
 )
+
+# Add some vertical space
+st.markdown("<br>", unsafe_allow_html=True)
 
 # Find supervisors button
 # Find supervisors button
