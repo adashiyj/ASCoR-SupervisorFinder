@@ -1,6 +1,6 @@
 import streamlit as st
-import gzip, pickle, spacy
-from sklearn.metrics.pairwise import cosine_similarity
+import gzip, pickle
+from recommender import recommend_supervisors
 
 st.set_page_config(page_title="ASCoR Supervisor Finder")
 
