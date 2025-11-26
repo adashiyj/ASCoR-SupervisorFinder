@@ -1,7 +1,7 @@
 import streamlit as st
 import gzip
 import pickle
-from recommender
+import recommender
 
 # Title
 st.title("ASCoR Supervisor Finder")
