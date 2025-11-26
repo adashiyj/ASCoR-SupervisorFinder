@@ -22,8 +22,8 @@ st.markdown("<br>", unsafe_allow_html=True)
 st.markdown(
     """
     Welcome! This is a **content-based recommender system** designed to help 
-    Computer Science students find a suitable thesis supervisor based on their research interests.
-    Please describe your research interests and what you would like to do for your thesis below.
+    Communication Science students find a suitable thesis supervisor based on their research interests.
+    Please click on the "Find My Supervisor(s)" button after entering your research interests.
     """,
 )
 
