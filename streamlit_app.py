@@ -12,35 +12,6 @@ We'll recommend suitable ASCoR supervisors and link you to the most relevant DOI
 """)
 
 
-# Load precomputed recommender package
-@st.cache_data
-def load_package():
-    try:
-        with gzip.open("researcher_works.pkl.gz", "rb") as f:
-            return pickle.load(f)
-    except Exception as e:
-        st.error("Failed to load model.")
-        st.code(str(e))
-        return None
-
-package = load_package()
-
-if not package:
-    st.stop()
-
-vectorizer = package["vectorizer"]
-tfidf_matrix = package["tfidf_matrix"]
-researcher_corpus = package["researcher_corpus"]
-researcher_top_keywords = package["researcher_top_keywords"]
-researcher_works = package["researcher_works"]
-
-researcher_names = list(researcher_corpus.keys())
-
-user_input = st.text_area(
-    "✍️ Describe your topic, approach, and possible methods:",
-    placeholder="E.g. I study social robots and human-machine communication using surveys..."
-)
-
 if st.button("🔍 Recommend Supervisors"):
     if not user_input.strip():
         st.warning("Please enter your research interests!")
