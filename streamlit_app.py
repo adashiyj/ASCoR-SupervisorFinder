@@ -1,45 +1,31 @@
 import streamlit as st
-from utils.recommender import recommend_supervisors
+from recommender import recommend_supervisors
 
-st.set_page_config(page_title="ASCoR Master's Thesis Supervisor Recommender", layout="wide")
+st.set_page_config(page_title="ASCoR Supervisor Finder", layout="wide")
 
-st.title("ASCoR Master's Thesis Supervisor Recommender")
+st.title("ASCoR Supervisor Finder")
 st.write(
-    "Share your research interests and preliminary ideas for your thesis below. "
-    "The system will suggest suitable supervisors at ASCoR and highlight some of their most relevant publications."
+    "Enter your research interests and preliminary thesis ideas below, "
+    "and the system will suggest suitable supervisors along with their top publications (DOIs)."
 )
 
-# User input
-user_input = st.text_area(
-    "Your research interests:",
-    "I am interested in human machine communication. I want to study the interaction with social robots."
-)
+user_input = st.text_area("Your research interests", height=150)
 
-# Options
-top_n = st.slider("Number of supervisors to recommend:", 1, 10, 3)
-top_papers = st.slider("Number of top papers per supervisor:", 1, 5, 3)
+top_n = st.slider("Number of supervisors to recommend", 1, 5, 3)
+top_papers = st.slider("Number of top publications per supervisor", 1, 5, 3)
 
 if st.button("Recommend"):
-    if not user_input.strip():
-        st.warning("Please enter your research interests.")
+    if user_input.strip():
+        recommendations = recommend_supervisors(user_input, top_n=top_n, top_papers=top_papers)
+
+        for r in recommendations:
+            st.subheader(r["researcher"])
+            st.write(f"Top keywords: {', '.join(r['top_keywords'])}")
+            st.write(f"Similarity score: {r['similarity_score']:.3f}")
+            st.write("Top papers:")
+            for paper in r["top_papers"]:
+                st.write(f" - DOI: {paper['doi']} (similarity: {paper['similarity']:.3f})")
+            st.markdown("---")
     else:
-        with st.spinner("Finding suitable supervisors..."):
-            recommendations = recommend_supervisors(user_input, top_n=top_n, top_papers=top_papers)
+        st.warning("Please enter your research interests before clicking Recommend.")
 
-        if not recommendations:
-            st.info("No suitable supervisors found.")
-        else:
-            st.success(f"Top {len(recommendations)} supervisor(s) found!")
-
-            for r in recommendations:
-                # Main supervisor info in header
-                similarity_pct = r['similarity_score'] * 100
-                header = f"{r['researcher']} (Similarity: {similarity_pct:.1f}%)"
-                
-                # Expandable section for each supervisor
-                with st.expander(header, expanded=False):
-                    st.write(f"**Top keywords:** {', '.join(r['top_keywords'])}")
-                    st.write("**Top papers:**")
-                    for paper in r["top_papers"]:
-                        sim_pct = paper["similarity"] * 100
-                        st.write(f"- DOI: {paper['doi']} (Similarity: {sim_pct:.1f}%)")
