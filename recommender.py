@@ -1,6 +1,9 @@
 import gzip
 import pickle
+import spacy
 from sklearn.metrics.pairwise import cosine_similarity
+
+nlp = spacy.load("en_core_web_sm") # Load spaCy model
 
 # Load precomputed data
 with gzip.open("precomputed.pkl.gz", "rb") as f:
@@ -14,7 +17,6 @@ tfidf_matrix = data["tfidf_matrix"]
 researcher_names = list(researcher_corpus.keys())
 
 def recommend_supervisors(user_input, top_n=3, top_papers=3):
-    import spacy
     nlp = spacy.load("en_core_web_sm")
     
     doc = nlp(user_input.lower())
