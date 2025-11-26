@@ -1,6 +1,5 @@
 import streamlit as st
 import gzip, pickle
-import spacy
 from recommender import recommend_supervisors
 
 st.set_page_config(page_title="ASCoR Supervisor Finder")
@@ -12,9 +11,6 @@ Tell us your **research interests and early thesis ideas**.
 We'll recommend suitable ASCoR supervisors and link you to the most relevant DOIs from their work.
 """)
 
-# Load spaCy model
-@st.cache_resource
-nlp = spacy.load("en_core_web_sm") 
 
 # Load precomputed recommender package
 @st.cache_data
