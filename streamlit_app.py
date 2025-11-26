@@ -11,7 +11,7 @@ st.set_page_config(
 
 # Header
 st.markdown(
-    "<h1 style='display: inline; font-size: 2rem;'>🎓 ASCoR Master's Thesis Supervisor Finder ✨</h1>",
+    "<h1 style='display: inline; font-size: 2rem;'>🎓 Find My Thesis Supervisor at ASCoR ✨</h1>",
     unsafe_allow_html=True
 )
 
@@ -21,10 +21,20 @@ st.markdown("<br>", unsafe_allow_html=True)
 # Description
 st.markdown(
     """
-    Welcome! This is a **content-based recommender system** designed to help 
-    Communication Science students find a suitable thesis supervisor based on their research interests.
-    Please click on the "Find My Supervisor(s)" button after entering your research interests.
-    """,
+    **Welcome!** 🎉  
+
+    This is a **content-based recommender system** designed to help Communication Science students at the UvA
+    find a suitable thesis supervisor based on their research interests and ideas.  
+
+    After entering your research interests in the box below and clicking the **"Find My Supervisor(s)"** button, 
+    the system will:  
+    1. Analyze your input to identify key topics.  
+    2. Compare your interests with available supervisors.  
+    3. Provide a **ranked list of supervisors** that best match your interests.  
+    4. Show each supervisor's **top keywords** in their publications and a few of their **most relevant papers** with links.  
+
+    This way, you can quickly see which supervisors align with your research goals and explore their work.
+    """
 )
 
 # Add some vertical space
