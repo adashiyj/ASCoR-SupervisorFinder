@@ -1,5 +1,6 @@
 import streamlit as st
 import gzip, pickle
+import spacy
 from recommender import recommend_supervisors
 
 st.set_page_config(page_title="ASCoR Supervisor Finder")
