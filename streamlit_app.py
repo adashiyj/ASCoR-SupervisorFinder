@@ -5,11 +5,11 @@ st.set_page_config(page_title="ASCoR Master's Thesis Supervisor Finder", page_ic
 
 st.title("ASCoR Master's Thesis Supervisor Finder✨")
 st.write(
-    "Enter your research interests and what you would like to do for your thesis (in the grey box below):"
+    "This is a self-developed content-based recommender system. the goal is to help CommSci students find a suitable thesis supervisor."
 )
 
 # User input
-user_input = st.text_area("", height=150)
+user_input = st.text_area("Enter your research interests and what you would like to do for your thesis (in the grey box below):", "", height=150)
 
 
 if st.button("Find My Supervisor(s)") and user_input.strip():
@@ -25,4 +25,4 @@ if st.button("Find My Supervisor(s)") and user_input.strip():
             for paper in res["top_papers"]:
                 st.markdown(f"- [{paper['doi']}]({paper['doi']}) – Similarity: {paper['similarity']:.3f}")
     else:
-        st.write("Try refining your input.")
+        st.write("Please refine your answers and try again.")
