@@ -5,11 +5,11 @@ st.set_page_config(page_title="ASCoR Master's Thesis Supervisor Finder", page_ic
 
 st.title("ASCoR Master's Thesis Supervisor Finder✨")
 st.write(
-    "Tell me something about your research interests and what you would like to do for your thesis."
+    "Enter your research interests and what you would like to do for your thesis (in the grey box below):"
 )
 
 # User input
-user_input = st.text_area("Your research interests", "", height=150)
+user_input = st.text_area("", height=150)
 
 
 if st.button("Find My Supervisor(s)") and user_input.strip():
