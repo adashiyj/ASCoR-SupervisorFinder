@@ -1,64 +1,80 @@
 import streamlit as st
-import gzip
-import pickle
-from recommender import recommend_supervisors
+import gzip, pickle, spacy
+from sklearn.metrics.pairwise import cosine_similarity
 
-# ---- Load precomputed data ----
+st.set_page_config(page_title="ASCoR Supervisor Finder")
+
+st.title("🎓 ASCoR Thesis Supervisor Recommender")
+
+st.write("""
+Tell us your **research interests and early thesis ideas**.  
+We'll recommend suitable ASCoR supervisors and link you to the most relevant DOIs from their work.
+""")
+
+# Load spaCy
+@st.cache_resource
+def load_nlp():
+    return spacy.load("en_core_web_sm")
+
+nlp = load_nlp()
+
+# Load precomputed recommender package
 @st.cache_data
-def load_data(pkl_file="precomputed_data.pkl.gz"):
-    with gzip.open(pkl_file, "rb") as f:
-        data = pickle.load(f)
-    return data
+def load_package():
+    try:
+        with gzip.open("researcher_works.pkl.gz", "rb") as f:
+            return pickle.load(f)
+    except Exception as e:
+        st.error("Failed to load model.")
+        st.code(str(e))
+        return None
 
-# Load precomputed TF-IDF, researcher_corpus, researcher_top_keywords, researcher_works, vectorizer, researcher_names
-precomputed = load_data()
-vectorizer = precomputed["vectorizer"]
-tfidf_matrix = precomputed["tfidf_matrix"]
-researcher_names = precomputed["researcher_names"]
-researcher_top_keywords = precomputed["researcher_top_keywords"]
-researcher_works = precomputed["researcher_works"]
+package = load_package()
 
-st.set_page_config(page_title="ASCoR Supervisor Finder", layout="wide")
+if not package:
+    st.stop()
 
-st.title("ASCoR Supervisor Finder")
-st.markdown(
-    "Write down your research interests and preliminary ideas for your thesis. "
-    "The system will suggest suitable supervisors along with their top publications."
-)
+vectorizer = package["vectorizer"]
+tfidf_matrix = package["tfidf_matrix"]
+researcher_corpus = package["researcher_corpus"]
+researcher_top_keywords = package["researcher_top_keywords"]
+researcher_works = package["researcher_works"]
 
-# ---- User input ----
+researcher_names = list(researcher_corpus.keys())
+
 user_input = st.text_area(
-    "Enter your research interests here:", 
-    height=150
+    "✍️ Describe your topic, approach, and possible methods:",
+    placeholder="E.g. I study social robots and human-machine communication using surveys..."
 )
 
-top_n = st.slider("Number of supervisors to recommend:", 1, 5, 3)
-top_papers = st.slider("Number of top papers per supervisor:", 1, 5, 3)
-
-if st.button("Find Supervisors"):
+if st.button("🔍 Recommend Supervisors"):
     if not user_input.strip():
-        st.warning("Please enter your research interests first!")
+        st.warning("Please enter your research interests!")
     else:
-        recommendations = recommend_supervisors(
-            user_input, 
-            top_n=top_n, 
-            top_papers=top_papers,
-            vectorizer=vectorizer,
-            tfidf_matrix=tfidf_matrix,
-            researcher_names=researcher_names,
-            researcher_top_keywords=researcher_top_keywords,
-            researcher_works=researcher_works
-        )
+        doc = nlp(user_input.lower())
+        tokens = [t.lemma_ for t in doc if t.is_alpha and not t.is_stop]
+        user_text = " ".join(tokens)
 
-        for r in recommendations:
-            st.subheader(r["researcher"])
-            st.markdown(f"**Top keywords:** {', '.join(r['top_keywords'])}")
-            st.markdown(f"**Similarity score:** {r['similarity_score']:.3f}")
-            
-            if r["top_papers"]:
-                st.markdown("**Top papers:**")
-                for paper in r["top_papers"]:
-                    st.markdown(f"- [{paper['doi']}]({paper['doi']}) (similarity: {paper['similarity']:.3f})")
-            st.markdown("---")
+        user_vec = vectorizer.transform([user_text])
+        sims = cosine_similarity(user_vec, tfidf_matrix).flatten()
+        top_idx = sims.argsort()[::-1][:3]
+
+        for i in top_idx:
+            rname = researcher_names[i]
+            st.subheader(rname)
+            st.write(f"**Match score:** `{sims[i]:.3f}`")
+            st.write("**Top expertise keywords:**", ", ".join(researcher_top_keywords.get(rname, [])))
+
+            works = researcher_works.get(rname, [])
+            if not works:
+                st.write("_No publications found_")
+            else:
+                top_papers = sorted(works, key=lambda w: w.get("cited_by_count", 0), reverse=True)[:3]
+                st.write("**Relevant publications (DOIs):**")
+                for p in top_papers:
+                    st.write("-", p.get("doi", "No DOI"), f"(citations: {p.get('cited_by_count', 0)})")
+
+            st.divider()
+
 
 
