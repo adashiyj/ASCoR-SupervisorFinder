@@ -3,7 +3,7 @@ from recommender import recommend_supervisors
 
 st.set_page_config(page_title="ASCoR Master's Thesis Supervisor Finder", page_icon="🎓")
 
-st.title("ASCoR Master's Thesis Supervisor Finder")
+st.title("ASCoR Master's Thesis Supervisor Finder✨")
 st.write(
     "Tell me something about your research interests and what you would like to do for your thesis."
 )
@@ -12,7 +12,7 @@ st.write(
 user_input = st.text_area("Your research interests", "", height=150)
 
 
-if st.button("Find Supervisors") and user_input.strip():
+if st.button("Find My Supervisor(s)") and user_input.strip():
     with st.spinner("Finding the best supervisors..."):
         results = recommend_supervisors(user_input)
 
