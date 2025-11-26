@@ -15,6 +15,10 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# Add some vertical space
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Description
 st.markdown(
     """
     Welcome! This is a **content-based recommender system** designed to help 
