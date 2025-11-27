@@ -63,7 +63,7 @@ if st.button("🔍 Find My Supervisor(s)"):
                 st.markdown(f"### {res['researcher']}")
                 st.markdown(f"**Similarity Score:** {res['similarity_score']:.3f}")
                 st.markdown(f"**💡 Key Topics:** {', '.join(res['top_keywords'])}")
-                st.markdown("** 📖 Relevant Papers:**")
+                st.markdown(f"** 📖 Relevant Papers:**")
                 for paper in res["top_papers"]:
                     st.markdown(
                         f"- [{paper['doi']}]({paper['doi']}) – Similarity: {paper['similarity']:.3f}"
