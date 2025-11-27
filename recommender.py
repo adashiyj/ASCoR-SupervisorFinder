@@ -33,7 +33,9 @@ def recommend_supervisors(user_input, top_n=3, top_papers=3):
         paper_texts = []
         paper_dois = []
         for w in works:
-            text = (w["title"] + " " + w.get("abstract", "")).lower()
+            title = w.get("title") or ""        # if None → becomes empty string
+            abstract = w.get("abstract") or ""  # if None → becomes empty string
+            text = (title + " " + abstract).lower().strip()
             paper_texts.append(text)
             paper_dois.append(w.get("doi", ""))
 
