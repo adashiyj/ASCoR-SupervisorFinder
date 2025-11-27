@@ -33,17 +33,26 @@ def recommend_supervisors(user_input, top_n=3, top_papers=3):
         paper_texts = []
         paper_dois = []
         for w in works:
-            title = w.get("title") or ""        # if None → becomes empty string
-            abstract = w.get("abstract") or ""  # if None → becomes empty string
+            doi = w.get("doi")
+            if not doi:  # Skip papers with no DOI
+                continue
+            title = w.get("title") or "" # if None → becomes empty
+            abstract = w.get("abstract") or "" # if None → becomes empty
             text = (title + " " + abstract).lower().strip()
             paper_texts.append(text)
-            paper_dois.append(w.get("doi", ""))
+            paper_dois.append(doi)
 
-        paper_vecs = vectorizer.transform(paper_texts)
-        paper_sims = cosine_similarity(user_vec, paper_vecs).flatten()
-        top_paper_indices = paper_sims.argsort()[::-1][:top_papers]
+        if not paper_texts:
+            top_paper_list = []
+        else:
+            paper_vecs = vectorizer.transform(paper_texts)
+            paper_sims = cosine_similarity(user_vec, paper_vecs).flatten()
+            top_paper_indices = paper_sims.argsort()[::-1][:top_papers]
 
-        top_paper_list = [{"doi": paper_dois[i], "similarity": float(paper_sims[i])} for i in top_paper_indices]
+            top_paper_list = [
+                {"doi": paper_dois[i], "similarity": float(paper_sims[i])}
+                for i in top_paper_indices
+            ]
 
         recommendations.append({
             "researcher": researcher,
