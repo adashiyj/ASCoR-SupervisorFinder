@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction import _stop_words
 from keybert import KeyBERT
+from sentence_transformers import SentenceTransformer
 
 # Load the model
 keybert_model = KeyBERT()
@@ -32,7 +33,7 @@ def recommend_supervisors(user_input):
 
     # 1. Embed user input
     user_text = preprocess(user_input)
-    user_emb = keybert_model._model.encode([user_text])[0].reshape(1, -1)
+    user_emb = sbert_model.encode([user_text], convert_to_numpy=True)
 
     # 2. Compute similarity with researcher papers
     researcher_scores = []
