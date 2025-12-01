@@ -26,14 +26,12 @@ st.markdown(
     This is a **content-based recommender system** designed to help Communication Science students at the UvA
     find a suitable thesis supervisor based on their research interests and ideas.  
 
-    After entering your research interests in the box below and clicking the **"Find My Supervisor(s)"** button, 
-    the system will:  
-    1. Analyze your input to identify key topics.  
-    2. Compare your interests with available supervisors.  
-    3. Provide a **ranked list of supervisors** that best match your interests.  
-    4. Show each supervisor's **top keywords** in their publications and a few of their **most relevant papers** with links.  
-
-    This way, you can quickly see which supervisors align with your research goals and explore their work.
+    After clicking **"Find My Supervisor(s)"**, the system will:  
+    1. Preprocess your input.  
+    2. Compute similarity using the pre-built TF-IDF model.  
+    3. Return the **top 3 most relevant ASCoR researchers**.  
+    4. Display an **AI-generated short research interest summary** for each researcher.  
+    5. Show the **top 3 most relevant papers** that include a DOI.
     """
 )
 
