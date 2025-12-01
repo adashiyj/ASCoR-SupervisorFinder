@@ -63,7 +63,7 @@ if st.button("🔍 Find My Supervisor(s)"):
                 st.markdown(f"### {res['researcher']}")
 
                 st.markdown(f"**Similarity Score:** {res['similarity_score']:.3f}")
-                st.markdown(f"**🧠 Research Interests:** {res.get('research_interests', '')}")
+                st.markdown(f"**🌟(AI-generated) research profile:** {res.get('research_interests', '')}")
                 st.markdown("📖 Relevant Papers:")
                 for paper in res["top_papers"]:
                     st.markdown(
