@@ -1,70 +1,55 @@
-import pickle
 import gzip
-import numpy as np
+import pickle
+import spacy
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction import _stop_words
-from keybert import KeyBERT
-from sentence_transformers import SentenceTransformer
 
-# Load the model
-keybert_model = KeyBERT()
-sbert_model = SentenceTransformer("all-MiniLM-L6-v2")
+nlp = spacy.load("en_core_web_sm") # Load spaCy model
 
-# Load precomputed data (vectorizer, TF-IDF matrix, researcher info)
+# Load precomputed data
 with gzip.open("precomputed.pkl.gz", "rb") as f:
     data = pickle.load(f)
 
-researcher_works = data["researcher_works"]          # original paper info
-researcher_names = list(researcher_works.keys())
-researcher_embeddings = data["researcher_embeddings"]  # dict: researcher -> paper embeddings (numpy arrays)
-researcher_top_keywords = data.get("researcher_top_keywords", {}) 
+researcher_works = data["researcher_works"]
+researcher_corpus = data["researcher_corpus"]
+researcher_top_keywords = data["researcher_top_keywords"]
+vectorizer = data["vectorizer"]
+tfidf_matrix = data["tfidf_matrix"]
+researcher_names = list(researcher_corpus.keys())
 
-# Simple preprocessing function (no spaCy)
-def preprocess(text):
-    tokens = [t.lower() for t in text.split() if t.isalpha() and t.lower() not in _stop_words.ENGLISH_STOP_WORDS]
-    return " ".join(tokens)
+def recommend_supervisors(user_input, top_n=3, top_papers=3):
+    nlp = spacy.load("en_core_web_sm")
+    
+    doc = nlp(user_input.lower())
+    tokens = [token.lemma_ for token in doc if token.is_alpha and not token.is_stop]
+    user_text = " ".join(tokens)
 
-# Recommender function
-def recommend_supervisors(user_input):
-    """
-    Recommend 3 researchers and their 3 most relevant papers with DOI.
-    """
-    top_n = 3        # top researchers
-    top_papers = 3   # top papers per researcher
+    user_vec = vectorizer.transform([user_text])
+    similarities = cosine_similarity(user_vec, tfidf_matrix).flatten()
+    top_indices = similarities.argsort()[::-1][:top_n]
 
-    # 1. Embed user input
-    user_text = preprocess(user_input)
-    user_emb = sbert_model.encode([user_text], convert_to_numpy=True)
-
-    # 2. Compute similarity with researcher papers
-    researcher_scores = []
-    for researcher in researcher_names:
-        papers_emb = researcher_embeddings[researcher]
-        sim_scores = cosine_similarity(user_emb, papers_emb).flatten()
-        avg_sim = sim_scores.mean()
-        researcher_scores.append((researcher, avg_sim, sim_scores))
-
-    # 3. Select top 3 researchers
-    top_researchers = sorted(researcher_scores, key=lambda x: x[1], reverse=True)[:top_n]
-
-    # 4. Build recommendation output
     recommendations = []
-    for researcher, avg_sim, paper_sims in top_researchers:
+    for idx in top_indices:
+        researcher = researcher_names[idx]
         works = researcher_works[researcher]
-        # Keep only papers with DOI
-        paper_info = [
-            {"doi": w.get("doi"), "similarity": float(sim)}
-            for w, sim in zip(works, paper_sims)
-            if w.get("doi")
-        ]
-        # Sort and select top 3 papers
-        paper_info = sorted(paper_info, key=lambda x: x["similarity"], reverse=True)[:top_papers]
+
+        paper_texts = []
+        paper_dois = []
+        for w in works:
+            text = (w["title"] + " " + w["abstract"]).lower()
+            paper_texts.append(text)
+            paper_dois.append(w["doi"])
+
+        paper_vecs = vectorizer.transform(paper_texts)
+        paper_sims = cosine_similarity(user_vec, paper_vecs).flatten()
+        top_paper_indices = paper_sims.argsort()[::-1][:top_papers]
+
+        top_paper_list = [{"doi": paper_dois[i], "similarity": paper_sims[i]} for i in top_paper_indices]
 
         recommendations.append({
             "researcher": researcher,
-            "top_keywords": researcher_top_keywords.get(researcher, []),
-            "similarity_score": float(avg_sim),
-            "top_papers": paper_info
+            "top_keywords": researcher_top_keywords[researcher],
+            "similarity_score": similarities[idx],
+            "top_papers": top_paper_list
         })
 
     return recommendations
