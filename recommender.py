@@ -10,6 +10,7 @@ researcher_works = data["researcher_works"]
 researcher_names = list(researcher_works.keys())
 tfidf_matrix = data["tfidf_matrix"]
 vectorizer = data["vectorizer"]
+researcher_interest_summary = data["researcher_interest_summary"]
 researcher_top_keywords = data["researcher_top_keywords"]
 
 def preprocess(text):
@@ -57,7 +58,7 @@ def recommend_supervisors(user_input):
 
         recommendations.append({
             "researcher": researcher,
-            "top_keywords": researcher_top_keywords.get(researcher, []),
+            "researcher_interest_summary": data["researcher_interest_summary"],
             "similarity_score": float(similarities[idx]),
             "top_papers": top_paper_list
         })
