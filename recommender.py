@@ -11,7 +11,6 @@ researcher_names = list(researcher_works.keys())
 tfidf_matrix = data["tfidf_matrix"]
 vectorizer = data["vectorizer"]
 researcher_interest_summary = data["researcher_interest_summary"]
-researcher_top_keywords = data["researcher_top_keywords"]
 
 def preprocess(text):
     """Simple preprocessing: lowercase, remove punctuation & stopwords."""
