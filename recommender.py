@@ -19,14 +19,18 @@ def preprocess(text):
     tokens = [t.lower() for t in text.split() if t.isalpha() and t.lower() not in _stop_words.ENGLISH_STOP_WORDS]
     return " ".join(tokens)
 
+# Recommender function
 def recommend_supervisors(user_input):
+    TOP_RESEARCHERS = 3
+    TOP_PAPERS = 3
+
+    # Preprocess user input
     user_text = preprocess(user_input)
     user_vec = vectorizer.transform([user_text])
-    similarities = cosine_similarity(user_vec, tfidf_matrix).flatten()
-    top_indices = similarities.argsort()[::-1][:top_n]
 
-    top_n=3
-    top_papers=3
+    # Compute similarity with researchers
+    similarities = cosine_similarity(user_vec, tfidf_matrix).flatten()
+    top_indices = similarities.argsort()[::-1][:TOP_RESEARCHERS]
 
     recommendations = []
     for idx in top_indices:
@@ -39,18 +43,19 @@ def recommend_supervisors(user_input):
             doi = w.get("doi")
             if not doi:  # Skip papers with no DOI
                 continue
-            title = w.get("title") or "" # if None → becomes empty
-            abstract = w.get("abstract") or "" # if None → becomes empty
+            title = w.get("title") or ""
+            abstract = w.get("abstract") or ""
             text = (title + " " + abstract).lower().strip()
             paper_texts.append(text)
             paper_dois.append(doi)
 
+        # Select top papers by similarity
         if not paper_texts:
             top_paper_list = []
         else:
             paper_vecs = vectorizer.transform(paper_texts)
             paper_sims = cosine_similarity(user_vec, paper_vecs).flatten()
-            top_paper_indices = paper_sims.argsort()[::-1][:top_papers]
+            top_paper_indices = paper_sims.argsort()[::-1][:TOP_PAPERS]
 
             top_paper_list = [
                 {"doi": paper_dois[i], "similarity": float(paper_sims[i])}
