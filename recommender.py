@@ -8,6 +8,7 @@ from sentence_transformers import SentenceTransformer
 
 # Load the model
 keybert_model = KeyBERT()
+sbert_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 # Load precomputed data (vectorizer, TF-IDF matrix, researcher info)
 with gzip.open("precomputed.pkl.gz", "rb") as f:
