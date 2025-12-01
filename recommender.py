@@ -19,11 +19,14 @@ def preprocess(text):
     tokens = [t.lower() for t in text.split() if t.isalpha() and t.lower() not in _stop_words.ENGLISH_STOP_WORDS]
     return " ".join(tokens)
 
-def recommend_supervisors(user_input, top_n=3, top_papers=3):
+def recommend_supervisors(user_input):
     user_text = preprocess(user_input)
     user_vec = vectorizer.transform([user_text])
     similarities = cosine_similarity(user_vec, tfidf_matrix).flatten()
     top_indices = similarities.argsort()[::-1][:top_n]
+
+    top_n=3
+    top_papers=3
 
     recommendations = []
     for idx in top_indices:
