@@ -33,7 +33,7 @@ st.markdown(
     3. Provide a **ranked list of supervisors** that best match your interests.  
     4. Show each supervisor's **top keywords** in their publications and a few of their **most relevant papers** with links.  
 
-    This way, you can quickly see which supervisors align with your research goals and explore their work.
+    This way, you can quickly see which ASCoR researchers align with your research goals and explore their work.
     """
 )
 
@@ -51,27 +51,36 @@ user_input = st.text_area(
 st.markdown("<br>", unsafe_allow_html=True)
 
 # Find supervisors button
-# Find supervisors button
 if st.button("🔍 Find My Supervisor(s)"):
     if user_input.strip():
         with st.spinner("Searching for the best supervisors..."):
             results = recommend_supervisors(user_input)
 
         if results:
-            st.success(f"Found {len(results)} supervisor(s) matching your research interests!")
-            for res in results:
-                st.markdown(f"### {res['researcher']}")
+            st.success("Found 3 ASCoR researchers matching your research interests!")
+            
+            for idx, res in enumerate(results, 1):
+                st.markdown(f"### {idx}. {res['researcher']}")
                 st.markdown(f"**Similarity Score:** {res['similarity_score']:.3f}")
-                st.markdown(f"**💡 Key Topics:** {', '.join(res['top_keywords'])}")
-                st.markdown("📖 Relevant Papers:")
-                for paper in res["top_papers"]:
-                    st.markdown(
-                        f"- [{paper['doi']}]({paper['doi']}) – Similarity: {paper['similarity']:.3f}"
-                    )
+                
+                # Display top keywords
+                if res['top_keywords']:
+                    st.markdown(f"**💡 Key Topics:** {', '.join(res['top_keywords'])}")
+                else:
+                    st.markdown("**💡 Key Topics:** N/A")
+                
+                # Display top papers
+                if res['top_papers']:
+                    st.markdown("📖 Top 3 Relevant Papers:")
+                    for paper in res["top_papers"]:
+                        doi = paper['doi']
+                        sim = paper['similarity']
+                        st.markdown(f"- [{doi}]({doi}) – Similarity: {sim:.3f}")
+                else:
+                    st.markdown("📖 Top 3 Relevant Papers: N/A")
+                
                 st.markdown("---")
         else:
             st.warning("No suitable supervisors found. Please refine your input and try again.")
     else:
         st.info("Please enter your research interests above before searching.")
-
-
