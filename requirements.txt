@@ -1,2 +1,6 @@
-streamlit
-scikit-learn
+streamlit>=1.24.0
+keybert>=0.10.0
+sentence-transformers>=2.2.2
+scikit-learn>=1.2.2
+spacy>=3.6.0
+numpy>=1.26.0
